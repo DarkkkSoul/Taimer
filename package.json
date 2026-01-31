@@ -1,8 +1,11 @@
 {
   "name": "taimer",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A production-quality timer application with accurate timing",
+  "author": "Your Name",
   "main": "main.js",
+  "homepage": "./",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -11,7 +14,40 @@
     "electron": "electron .",
     "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5174 && electron .\"",
     "build-electron": "npm run build && electron .",
-    "dist": "npm run build && electron-builder"
+    "react-build": "tsc -b && vite build",
+    "electron-build": "electron-builder",
+    "dist": "npm run react-build && electron-builder"
+  },
+  "build": {
+    "appId": "com.yourname.taimer",
+    "productName": "Taimer - Desktop Timer",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png",
+      "category": "Utility"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -29,6 +65,7 @@
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^40.1.0",
+    "electron-builder": "^25.2.4",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

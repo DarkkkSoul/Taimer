@@ -284,3 +284,71 @@ This responsive design makes the timer perfect for:
 - **Large desktop use**: Full-featured with beautiful design
 - **Small corner widget**: Minimal footprint showing just essentials
 - **Flexible positioning**: Can be sized to fit any workflow need
+## Electron Desktop App Setup
+
+### 8. Installed electron-builder (`npm install --save-dev electron-builder`)
+- **Purpose**: Creates installers for Windows (.exe), macOS (.dmg), and Linux (.AppImage)
+- **Version**: electron-builder@25.2.4 (latest)
+
+### 9. Updated package.json Configuration
+- **Added**: Complete electron-builder configuration in "build" section
+- **App Details**:
+  - `appId`: "com.yourname.taimer" (unique identifier)
+  - `productName`: "Taimer - Desktop Timer" (display name)
+  - `version`: "1.0.0" (app version)
+- **Build Targets**:
+  - Windows: NSIS installer (.exe)
+  - macOS: DMG disk image (.dmg)
+  - Linux: AppImage (.AppImage)
+- **Files Included**: dist/**, main.js, preload.js, node_modules/**
+- **Scripts Added**:
+  - `react-build`: Builds React app only
+  - `electron-build`: Creates Electron package only
+  - `dist`: Full build pipeline (React + Electron installer)
+
+### 10. Created Build Resources Directory (`build/`)
+- **Purpose**: Contains app icons and build resources
+- **Icon Files Needed**:
+  - `build/icon.ico` - Windows (256x256+ pixels)
+  - `build/icon.icns` - macOS (512x512+ pixels)
+  - `build/icon.png` - Linux (512x512 pixels)
+- **Status**: Directory created with README for icon guidelines
+
+### 11. Tested Build Process
+- **React Build**: ✅ Successfully builds to `dist/` folder (1.18s)
+- **Electron Package**: ✅ Creates unpacked app in `dist/linux-unpacked/`
+- **Full Installer**: ✅ Creates `Taimer - Desktop Timer-1.0.0.AppImage` (Linux)
+- **File Size**: ~115MB (includes Electron runtime)
+
+### 12. Created Download Documentation (`download.md`)
+- **Complete Setup Guide**: Step-by-step installation and build instructions
+- **Platform Instructions**: Specific steps for Windows, macOS, Linux
+- **Troubleshooting**: Common issues and solutions
+- **Customization Guide**: How to add icons and modify app details
+
+## Build Commands Summary
+
+```bash
+# Install dependencies
+npm install
+
+# Build React app only
+npm run react-build
+
+# Create Electron package (directory only)
+npm run electron-build -- --dir
+
+# Create full installer for current platform
+npm run dist
+
+# Development mode
+npm run electron-dev
+```
+
+## Output Files (after npm run dist)
+
+- **Linux**: `dist/Taimer - Desktop Timer-1.0.0.AppImage`
+- **Windows**: `dist/Taimer - Desktop Timer Setup 1.0.0.exe` (when built on Windows)
+- **macOS**: `dist/Taimer - Desktop Timer-1.0.0.dmg` (when built on macOS)
+
+The application is now ready for distribution as a standalone desktop app!
