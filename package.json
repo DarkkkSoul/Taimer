@@ -20,16 +20,16 @@
   },
   "build": {
     "appId": "com.yourname.taimer",
-    "productName": "Taimer - Desktop Timer",
+    "productName": "Taimer",
     "directories": {
       "buildResources": "build"
     },
-    "files": [
-      "dist/**/*",
-      "main.js",
-      "preload.js",
-      "node_modules/**/*"
-    ],
+     "files": [
+    "renderer-dist/**/*",
+    "main.js",
+    "preload.js",
+    "package.json"
+  ],
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
