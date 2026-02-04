@@ -65,15 +65,15 @@ export const ElectronControls: React.FC = () => {
         onClick={handleToggleAlwaysOnTop}
         className={`group relative flex items-center justify-center w-8 h-8 min-[280px]:min-h-[200px]:w-10 min-[280px]:min-h-[200px]:h-10 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none ${
           isAlwaysOnTop
-            ? 'border-2 border-yellow-400/90 bg-linear-to-r from-purple-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 focus:ring-4 focus:ring-purple-500/30 shadow-lg shadow-purple-500/25'
+            ? 'border-2 border-yellow-400/90 bg-white hover:from-purple-400 hover:to-indigo-400 shadow-lg shadow-purple-500/25'
             : 'border-2 border-white bg-black/20 hover:bg-black/30 focus:ring-4 focus:ring-white/20'
         }`}
         title={isAlwaysOnTop ? 'Disable Always On Top' : 'Enable Always On Top'}
       >
         {isAlwaysOnTop ? (
-          <Pin className="w-3 h-3 min-[280px]:min-h-[200px]:w-4 min-[280px]:min-h-[200px]:h-4 text-white" />
+          <Pin className="w-3 h-3 min-[280px]:min-h-[200px]:w-4 min-[280px]:min-h-[200px]:h-4 text-black" />
         ) : (
-          <PinOff className="w-3 h-3 min-[280px]:min-h-[200px]:w-4 min-[280px]:min-h-[200px]:h-4 text-white/70" />
+          <PinOff className="w-3 h-3 min-[280px]:min-h-[200px]:w-4 min-[280px]:min-h-[200px]:h-4 text-black" />
         )}
         
         {/* Hover effect */}
