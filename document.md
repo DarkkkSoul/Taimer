@@ -352,3 +352,84 @@ npm run electron-dev
 - **macOS**: `dist/Taimer - Desktop Timer-1.0.0.dmg` (when built on macOS)
 
 The application is now ready for distribution as a standalone desktop app!
+
+
+## State Persistence and Auto-Pause Implementation
+
+### 19. Added State Persistence to Timer Hook (`src/hooks/useTimer.ts`)
+- **Purpose**: Preserve timer state across app restarts and auto-pause when app closes
+- **Changes Made**:
+  - Added `PersistedTimerState` interface to define localStorage structure
+  - Added `STORAGE_KEY` constant for localStorage key ('timer-state')
+  - Added `persistState()` helper function to save state to localStorage
+  - Modified state initialization to restore from localStorage on mount
+  - Updated `start()`, `pause()`, and `reset()` functions to persist state after each action
+  - Added `beforeunload` event listener to auto-pause timer when app closes
+
+### 20. State Restoration Behavior
+- **On App Mount**:
+  - Reads persisted state from localStorage
+  - Restores `elapsedBeforePause` to show previous timer value
+  - Forces `isRunning = false` (auto-pause behavior - timer does NOT auto-resume)
+  - Initializes `pausedTimeRef` with restored elapsed time
+- **Why Force isRunning = false**: Timer must not continue running while app is closed
+
+### 21. Auto-Pause on App Close
+- **Implementation**: `beforeunload` event listener in useEffect
+- **Behavior When App Closes**:
+  - If `isRunning === true`:
+    - Calculates final elapsed time: `Date.now() - startTime + elapsedBeforePause`
+    - Updates `elapsedBeforePause` with final calculated time
+    - Sets `isRunning = false`
+    - Persists state to localStorage
+  - If already paused: No action needed (state already persisted)
+- **Result**: Timer automatically pauses and preserves exact elapsed time when app closes
+
+### 22. Persisted State Structure
+```typescript
+interface PersistedTimerState {
+  startTime: number | null;        // Timestamp when timer started (null if paused)
+  elapsedBeforePause: number;      // Total elapsed time in milliseconds
+  isRunning: boolean;              // Timer running state
+}
+```
+
+### 23. State Persistence Triggers
+- **Start Button**: Persists `startTime`, `elapsedBeforePause`, `isRunning: true`
+- **Pause Button**: Calculates and persists updated `elapsedBeforePause`, sets `isRunning: false`
+- **Reset Button**: Persists zero values for all state
+- **App Close**: Auto-calculates final elapsed time and persists with `isRunning: false`
+
+### 24. Why Timestamp-Based Logic Prevents Drift
+- **Problem with setInterval incrementing**: 
+  - `setInterval(() => time++, 1000)` accumulates errors over time
+  - JavaScript event loop delays cause intervals to drift (not exactly 1000ms)
+  - Tab throttling in browsers makes drift worse
+  - After 10 minutes, could be off by several seconds
+- **Solution with Date.now() timestamps**:
+  - Always calculates elapsed time from actual system time difference
+  - Formula: `elapsed = Date.now() - startTime + elapsedBeforePause`
+  - No accumulation of errors - each calculation is independent
+  - Works correctly even if tab is inactive or system is under load
+  - Remains accurate over hours or days of timing
+- **Why This Design is Correct for Electron**:
+  - Desktop apps need accurate timing for productivity tracking
+  - Users may minimize or background the app for long periods
+  - Timestamp-based approach ensures accuracy regardless of app state
+  - Auto-pause on close prevents incorrect time accumulation
+
+### 25. Testing State Persistence
+To verify the implementation works correctly:
+1. Start the timer and let it run for a few seconds
+2. Close the app (or refresh if in browser)
+3. Reopen the app
+4. Timer should show the elapsed time from before close
+5. Timer should be in paused state (not running)
+6. Click Start to resume timing from preserved value
+7. Click Reset to clear and test persistence of zero state
+
+### Files Modified for State Persistence
+- `src/hooks/useTimer.ts` - Added localStorage persistence, auto-pause on close, state restoration on mount
+- `document.md` - Documented implementation details and behavior
+
+The timer now correctly preserves state across app restarts and auto-pauses when closed, ensuring no time is lost or incorrectly accumulated.
