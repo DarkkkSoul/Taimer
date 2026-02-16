@@ -13,7 +13,7 @@ export interface TimerControls {
 
 export interface UseTimerReturn extends TimerState, TimerControls { }
 
-// LocalStorage key for persisting timer state
+// LocalStorage key
 const STORAGE_KEY = 'timer-state';
 
 // Interface for persisted state
@@ -29,68 +29,56 @@ interface PersistedTimerState {
  * Persists state to localStorage and auto-pauses on app close
  */
 export const useTimer = (): UseTimerReturn => {
-  // Timer state - initialize from localStorage if available
-  const [isRunning, setIsRunning] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed: PersistedTimerState = JSON.parse(saved);
-      // Always force isRunning to false on mount (auto-pause behavior)
-      return false;
-    }
-    return false;
-  });
 
-  const [elapsedTime, setElapsedTime] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed: PersistedTimerState = JSON.parse(saved);
-      // Restore the elapsed time from before pause
-      return parsed.elapsedBeforePause;
-    }
-    return 0;
-  });
+  // ✅ Read localStorage ONCE
+  const savedState = localStorage.getItem(STORAGE_KEY);
+  const parsedState: PersistedTimerState | null = savedState
+    ? JSON.parse(savedState)
+    : null;
 
-  // Refs to store timing data without causing re-renders
+  // Always force paused on mount
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+
+  const [elapsedTime, setElapsedTime] = useState<number>(
+    parsedState?.elapsedBeforePause ?? 0
+  );
+
+  // Refs (no lazy functions!)
   const startTimeRef = useRef<number | null>(null);
-  const pausedTimeRef = useRef<number>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed: PersistedTimerState = JSON.parse(saved);
-      return parsed.elapsedBeforePause;
-    }
-    return 0;
-  });
+  const pausedTimeRef = useRef<number>(
+    parsedState?.elapsedBeforePause ?? 0
+  );
   const intervalRef = useRef<number | null>(null);
 
   /**
-   * Persists timer state to localStorage
+   * Persist timer state
    */
   const persistState = useCallback((state: PersistedTimerState) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, []);
 
   /**
-   * Updates elapsed time based on current timestamp
-   * This approach prevents drift by always calculating from the actual time difference
+   * Calculate elapsed time using timestamp difference
+   * Prevents drift because it always uses actual time difference
    */
   const updateElapsedTime = useCallback(() => {
     if (startTimeRef.current !== null) {
       const now = Date.now();
-      const currentElapsed = now - startTimeRef.current + pausedTimeRef.current;
+      const currentElapsed =
+        now - startTimeRef.current + pausedTimeRef.current;
+
       setElapsedTime(currentElapsed);
     }
   }, []);
 
   /**
-   * Starts the timer
-   * Records start timestamp and begins interval for UI updates
+   * Start timer
    */
   const start = useCallback(() => {
     if (!isRunning) {
       startTimeRef.current = Date.now();
       setIsRunning(true);
 
-      // Persist state
       persistState({
         startTime: startTimeRef.current,
         elapsedBeforePause: pausedTimeRef.current,
@@ -100,17 +88,17 @@ export const useTimer = (): UseTimerReturn => {
   }, [isRunning, persistState]);
 
   /**
-   * Pauses the timer
-   * Preserves elapsed time and stops the interval
+   * Pause timer
    */
   const pause = useCallback(() => {
     if (isRunning && startTimeRef.current !== null) {
       const now = Date.now();
       pausedTimeRef.current += now - startTimeRef.current;
       startTimeRef.current = null;
+
+      setElapsedTime(pausedTimeRef.current);
       setIsRunning(false);
 
-      // Persist state
       persistState({
         startTime: null,
         elapsedBeforePause: pausedTimeRef.current,
@@ -120,16 +108,15 @@ export const useTimer = (): UseTimerReturn => {
   }, [isRunning, persistState]);
 
   /**
-   * Resets the timer
-   * Clears all timing data and stops the interval
+   * Reset timer
    */
   const reset = useCallback(() => {
     setIsRunning(false);
     setElapsedTime(0);
+
     startTimeRef.current = null;
     pausedTimeRef.current = 0;
 
-    // Persist cleared state
     persistState({
       startTime: null,
       elapsedBeforePause: 0,
@@ -137,53 +124,54 @@ export const useTimer = (): UseTimerReturn => {
     });
   }, [persistState]);
 
-  // Effect to manage the update interval
+  /**
+   * Manage interval for smooth UI updates
+   */
   useEffect(() => {
     if (isRunning) {
-      // Update every 100ms for smooth UI updates
-      intervalRef.current = setInterval(updateElapsedTime, 100);
+      intervalRef.current = window.setInterval(updateElapsedTime, 100);
     } else {
-      // Clean up interval when paused or stopped
-      if (intervalRef.current) {
+      if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     }
 
-    // Cleanup function to prevent memory leaks
     return () => {
-      if (intervalRef.current) {
+      if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
   }, [isRunning, updateElapsedTime]);
 
-  // Effect to handle auto-pause on app close
+  /**
+   * Auto-pause on app close
+   */
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // If timer is running, calculate final elapsed time and auto-pause
       if (isRunning && startTimeRef.current !== null) {
         const now = Date.now();
-        const finalElapsed = now - startTimeRef.current + pausedTimeRef.current;
+        const finalElapsed =
+          now - startTimeRef.current + pausedTimeRef.current;
 
-        // Persist auto-paused state
-        persistState({
-          startTime: null,
-          elapsedBeforePause: finalElapsed,
-          isRunning: false,
-        });
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            startTime: null,
+            elapsedBeforePause: finalElapsed,
+            isRunning: false,
+          })
+        );
       }
     };
 
-    // Add event listener for app close
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Cleanup event listener on unmount
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isRunning, persistState]);
+  }, [isRunning]);
 
   return {
     isRunning,
