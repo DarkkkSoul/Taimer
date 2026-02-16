@@ -63,7 +63,7 @@ export const ElectronControls: React.FC = () => {
     <div className="absolute top-2 right-2 z-20 min-[280px]:min-h-[200px]:top-4 min-[280px]:min-h-[200px]:right-4">
       <button
         onClick={handleToggleAlwaysOnTop}
-        className={`group relative flex items-center justify-center w-8 h-8 min-[280px]:min-h-[200px]:w-10 min-[280px]:min-h-[200px]:h-10 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none ${
+        className={`group relative cursor-pointer flex items-center justify-center w-8 h-8 min-[280px]:min-h-[200px]:w-10 min-[280px]:min-h-[200px]:h-10 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none ${
           isAlwaysOnTop
             ? 'border-2 border-yellow-400/90 bg-white hover:from-purple-400 hover:to-indigo-400 shadow-lg shadow-purple-500/25'
             : 'border-2 border-white bg-black/20 hover:bg-black/30 focus:ring-4 focus:ring-white/20'

@@ -32,13 +32,13 @@ export const Timer: React.FC = () => {
 
       {/* Main Timer Container - Responsive Layout */}
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
-        
+
         {/* Large Screen Layout */}
-        <div className="hidden sm:block min-[280px]:min-h-[200px]:flex flex-col items-center justify-center bg-black/20 backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div className="hidden sm:block min-[280px]:min-h-[200px]:flex flex-col items-center justify-center bg-black/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl/80 shadow-white/70">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white/90 mb-2">Taimer</h1>
-            <p className="text-purple-200 text-sm">Stay focused, stay productive</p>
+            <h1 className="text-2xl font-bold tracking-wide text-white/90 mb-2">Taimer</h1>
+            <p className="text-white tracking-wider text-sm">Stay focused, stay productive</p>
           </div>
 
           {/* Timer Display */}
@@ -53,21 +53,21 @@ export const Timer: React.FC = () => {
           </div>
 
           {/* Control Buttons */}
-         <div className="flex justify-center items-center space-x-3">
+          <div className="flex justify-center items-center space-x-3">
             {/* Start/Pause Button - Smaller */}
             {!isRunning ? (
               <button
                 onClick={start}
-                className="flex items-center justify-center w-12 h-12 border-2 cursor-pointer border-white/90 rounded-full transition-all duration-300 focus:outline-none shadow-lg"
+                className="flex items-center justify-center w-14 h-14 border-2 cursor-pointer border-white/90 rounded-full transition-all duration-300 focus:outline-none shadow-lg"
               >
-                <Play className="w-4 h-4 text-white/90 ml-0.5" fill="currentColor" />
+                <Play className="w-5 h-5 text-white/90 ml-0.5" fill="currentColor" />
               </button>
             ) : (
               <button
                 onClick={pause}
-                className="flex items-center justify-center bg-white w-12 h-12 cursor-pointer rounded-full transition-all duration-300 focus:outline-none shadow-lg"
+                className="flex items-center justify-center bg-white w-14 h-14 cursor-pointer rounded-full transition-all duration-300 focus:outline-none shadow-lg"
               >
-                <Pause className="w-4 h-4 text-[#2c2f38]" fill="currentColor" />
+                <Pause className="w-5 h-5 text-[#2c2f38]" fill="currentColor" />
               </button>
             )}
 
@@ -75,13 +75,12 @@ export const Timer: React.FC = () => {
             <button
               onClick={reset}
               disabled={elapsedTime === 0}
-              className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 focus:outline-none ${
-                elapsedTime === 0
-                  ? 'bg-gray-600/50 cursor-not-allowed'
-                  : 'bg-[#192230] shadow-lg cursor-pointer'
-              }`}
+              className={`flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 focus:outline-none ${elapsedTime === 0
+                ? 'bg-gray-600/50 cursor-not-allowed'
+                : 'bg-[#192230] shadow-lg cursor-pointer'
+                }`}
             >
-              <RotateCcw className={`w-4 h-4 ${elapsedTime === 0 ? 'text-gray-400' : 'text-white'}`} />
+              <RotateCcw className={`w-5 h-5 ${elapsedTime === 0 ? 'text-gray-400' : 'text-white'}`} />
             </button>
           </div>
 
@@ -123,11 +122,10 @@ export const Timer: React.FC = () => {
             <button
               onClick={reset}
               disabled={elapsedTime === 0}
-              className={`flex items-center justify-center w-10 h-10  rounded-full transition-all duration-300 focus:outline-none ${
-                elapsedTime === 0
-                  ? 'bg-gray-600/50 cursor-not-allowed'
-                  : 'bg-[#192230] shadow-lg cursor-pointer'
-              }`}
+              className={`flex items-center justify-center w-10 h-10  rounded-full transition-all duration-300 focus:outline-none ${elapsedTime === 0
+                ? 'bg-gray-600/50 cursor-not-allowed'
+                : 'bg-[#192230] shadow-lg cursor-pointer'
+                }`}
             >
               <RotateCcw className={`w-4 h-4 ${elapsedTime === 0 ? 'text-gray-400' : 'text-white'}`} />
             </button>
